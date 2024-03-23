@@ -1,18 +1,12 @@
-import { parsePath, debug, info, error } from "./utils/utils";
+import { debug, info, error } from "./utils/helpers";
+import { parsePath, getListings, parseListing, parseSearchQuery } from "./utils/parsers";
+import { filterListing } from "./filter";
 
 // Classes
-const ROW_LISTINGS_CLASS_NAME = "user-ad-row-new-design";
-const GALLERY_LISTINGS_CLASS_NAME = "user-ad-square-new-design";
 const DISPLAY_RADIO_BUTTON_CLASS_NAME = "radio-set__option srp-display-options__view";
 
 // Settings
 const OPACITY = "0.5";
-
-const getListings = (view: string | undefined): HTMLCollectionOf<HTMLElement> => {
-  const className = view === "gallery" ? GALLERY_LISTINGS_CLASS_NAME : ROW_LISTINGS_CLASS_NAME;
-
-  return document.getElementsByClassName(className) as HTMLCollectionOf<HTMLElement>;
-}
 
 const mutationCallback: MutationCallback = (mutationList: MutationRecord[], _observer: MutationObserver) => {
   // Rerun when mutation occurs
@@ -40,14 +34,18 @@ const main = () => {
   document.body.style.border = "5px solid red";
 
   const urlComponents = parsePath(document.URL);
+  // urlComponents.searchQuery = parseSearchQuery();
+  const listingsNode = getListings(urlComponents.view);
 
-  const listings = getListings(urlComponents.view);
+  debug(`Found ${listingsNode.length} listings`);
 
-  debug(`Found ${listings.length} listings`);
-
-  for (const listing of listings) {
-    debug(`Listing: ${listing.ariaLabel}`);
-    listing.style.opacity = OPACITY;
+  for (const listingNode of listingsNode) {
+    // debug(`Listing: ${listing.ariaLabel}`);
+    // listing.style.opacity = OPACITY;
+    const listing = parseListing(urlComponents.view, listingNode);
+    if (filterListing(urlComponents.searchQuery, listing)) {
+      listingNode.style.opacity = OPACITY;
+    }
   }
 }
 
