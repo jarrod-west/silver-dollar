@@ -1,5 +1,5 @@
 import { debug, info, error } from "./utils/helpers";
-import { parsePath, getListings, parseListing, parseSearchQuery } from "./utils/parsers";
+import { parsePath, getListings, parseListing } from "./utils/parsers";
 import { filterListing } from "./filter";
 
 // Classes
