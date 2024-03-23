@@ -1,0 +1,25 @@
+{
+  "name": "silver-dollar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc --build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "web-ext": "web-ext run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jarrod-west/silver-dollar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jarrod-west/silver-dollar/issues"
+  },
+  "homepage": "https://github.com/jarrod-west/silver-dollar#readme",
+  "devDependencies": {
+    "typescript": "^5.4.3",
+    "web-ext": "^7.11.0"
+  }
+}
