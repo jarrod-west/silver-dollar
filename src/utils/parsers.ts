@@ -80,13 +80,13 @@ export const getListings = (view: string): HTMLCollectionOf<HTMLElement> => {
   return document.getElementsByClassName(className) as HTMLCollectionOf<HTMLElement>;
 }
 
-export const parseSearchQuery = (): string => {
-  const searchNode = document.getElementById(SEARCH_TEXTBOX_ID);
+// export const parseSearchQuery = (): string => {
+//   const searchNode = document.getElementById(SEARCH_TEXTBOX_ID);
 
-  debug(`Search query: ${searchNode}`);
+//   debug(`Search query: ${searchNode}`);
 
-  return searchNode?.nodeValue || "Unknown";
-}
+//   return searchNode?.nodeValue || "Unknown";
+// }
 
 export const parseListing = (view: string, listingsNode: HTMLElement): Listing => {
   const titleNode = listingsNode.getElementsByClassName(view === "gallery" ? GALLERY_LISTING_TITLE_CLASS_NAME: ROW_LISTING_TITLE_CLASS_NAME);
