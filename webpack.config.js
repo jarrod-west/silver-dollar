@@ -17,6 +17,7 @@ const commonExportConfig = {
 
 // Two exports: main bundle and options
 module.exports = [{
+  // Main extension bundle
   ...commonExportConfig,
   entry: './src/index.ts',
   output: {
@@ -25,10 +26,18 @@ module.exports = [{
   },
 },
 {
+  // Script for the "options" page
   ...commonExportConfig,
   entry: './src/options.ts',
   output: {
     filename: 'options.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  // Background stripts
+  ...commonExportConfig,
+  entry: './src/background.ts',
+  output: {
+    filename: 'background.js',
     path: path.resolve(__dirname, 'dist'),
   },
 }];

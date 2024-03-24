@@ -60,4 +60,5 @@ const main = async () => {
 
 info("Loaded");
 createDisplayChangeObserver();
-main();
+// createToolbarButton();
+// main(); // TODO: Still necessary, or does the initial load get triggered as a mutation?

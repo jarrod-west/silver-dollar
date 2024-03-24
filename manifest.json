@@ -16,6 +16,10 @@
       }
     ],
 
+    "background": {
+      "scripts": ["background.js"]
+    },
+
     "permissions": ["storage"],
 
     "options_ui": {
@@ -24,7 +28,14 @@
 
     "browser_specific_settings": {
       "gecko": {
-        "id": "addon@example.com"
+        "id": "silver-dollar@example.org"
+      }
+    },
+
+    "browser_action": {
+      "default_icon": {
+        "16": "icons/border-16.png",
+        "32": "icons/border-32.png"
       }
     }
   }
