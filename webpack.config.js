@@ -33,11 +33,11 @@ module.exports = [{
     filename: 'options.js',
     path: path.resolve(__dirname, 'dist'),
   },
-  // Background stripts
+  // Popup stript
   ...commonExportConfig,
-  entry: './src/background.ts',
+  entry: './src/popup.ts',
   output: {
-    filename: 'background.js',
+    filename: 'popup.js',
     path: path.resolve(__dirname, 'dist'),
   },
 }];

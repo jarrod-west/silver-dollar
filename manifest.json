@@ -16,10 +16,6 @@
       }
     ],
 
-    "background": {
-      "scripts": ["background.js"]
-    },
-
     "permissions": ["storage"],
 
     "options_ui": {
@@ -33,6 +29,7 @@
     },
 
     "browser_action": {
+      "default_popup": "html/popup.html",
       "default_icon": {
         "16": "icons/border-16.png",
         "32": "icons/border-32.png"
