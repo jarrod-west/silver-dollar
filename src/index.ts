@@ -28,10 +28,21 @@ const createDisplayChangeObserver = () => {
   }
 }
 
-const main = () => {
+const main = async () => {
   debug("Main");
   // Leave this in to make it clear the extension loaded
-  document.body.style.border = "5px solid red";
+  // document.body.style.border = "5px solid red";
+
+  try {
+    let color = "blue"; // TODO: Necessary?
+    const stored = await browser.storage.sync.get("color");
+    if (stored.color) {
+      color = stored.color;
+    }
+    document.body.style.border = `5px solid ${color}`;
+  } catch (err) {
+    error(`Error retrieving color: ${err}`);
+  }
 
   const urlComponents = parsePath(document.URL);
   const listingsNode = getListings(urlComponents.view);

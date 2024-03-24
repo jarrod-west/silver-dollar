@@ -1,7 +1,6 @@
 const path = require('path');
 
-module.exports = {
-  entry: './src/index.ts',
+const commonExportConfig = {
   module: {
     rules: [
       {
@@ -13,9 +12,23 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-  },
+  }
+}
+
+// Two exports: main bundle and options
+module.exports = [{
+  ...commonExportConfig,
+  entry: './src/index.ts',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
-};
+},
+{
+  ...commonExportConfig,
+  entry: './src/options.ts',
+  output: {
+    filename: 'options.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+}];
