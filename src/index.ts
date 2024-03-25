@@ -57,6 +57,12 @@ const main = async () => {
   }
 }
 
+browser.runtime.onMessage.addListener((request) => {
+  debug(`Message received: ${request.message}`);
+
+  return Promise.resolve({response: "Response from content"});
+})
+
 
 info("Loaded");
 createDisplayChangeObserver();
