@@ -1,6 +1,7 @@
 const path = require('path');
 
 const commonExportConfig = {
+  devtool: 'cheap-module-source-map', // Stop using eval for development mode, with causes CSP errors
   module: {
     rules: [
       {
