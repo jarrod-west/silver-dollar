@@ -61,6 +61,10 @@ const createDisplayChangeObserver = () => {
   }
 };
 
+const createMessageListener = () => {
+  browser.runtime.onMessage.addListener(onMessage);
+};
+
 const calculateOpacity = async (): Promise<string> => {
   // Inverse of the transparency, converted to a decimal between 0 and 1, then to a string
   const transparency = (await getStoredSetting(TRANSPARENCY_SETTING)) as number;
@@ -88,5 +92,5 @@ export const main = async () => {
 
 info("Loaded");
 createDisplayChangeObserver();
-browser.runtime.onMessage.addListener(onMessage);
+createMessageListener();
 main(); // TODO: Do on-load
