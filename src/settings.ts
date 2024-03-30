@@ -5,8 +5,8 @@ import { RawSettings, SettingsMessage, BaseMessage } from "./types";
 const DEFAULT_SETTINGS: RawSettings = {
   transparency: 70,
   fuzziness: 95,
-  titleOnly: true
-}
+  titleOnly: true,
+};
 
 export const getStoredSetting = async (setting: keyof RawSettings) => {
   const settingNode = await browser.storage.sync.get(setting);
@@ -16,20 +16,20 @@ export const getStoredSetting = async (setting: keyof RawSettings) => {
   }
 
   return settingNode[setting];
-}
+};
 
 export const getStoredSettings = async (): Promise<RawSettings> => {
   const settings = await browser.storage.sync.get(null);
 
   // Add any defaults
   Object.entries(DEFAULT_SETTINGS).forEach(([key, value]) => {
-    if (!(Object.keys(settings).includes(key))) {
+    if (!Object.keys(settings).includes(key)) {
       settings[key] = value;
     }
-  })
+  });
 
   return settings as RawSettings;
-}
+};
 
 export class PopupSetting {
   private name: keyof RawSettings;
@@ -61,9 +61,12 @@ export class PopupSetting {
         debug(`Value for ${this.uiName} changed`);
 
         let message: Record<string, string | number | boolean> = {
-          type: "SETTINGS"
+          type: "SETTINGS",
         };
-        message[this.name] = this.uiType === "checkbox" ? this.uiElement.checked : this.uiElement.value;
+        message[this.name] =
+          this.uiType === "checkbox"
+            ? this.uiElement.checked
+            : this.uiElement.value;
 
         await sendMessageToWindow(message as SettingsMessage);
       });

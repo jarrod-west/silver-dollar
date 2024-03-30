@@ -20,14 +20,13 @@ export type Listing = {
 };
 
 export const parsePath = (urlString: string): UrlComponents => {
-
   // Format = /[category]/search/[page]/[id]
   // If category is present, prefixed with "s-".  If not, the search is prefixes with "s-"
   // If the page is not present it's page one, otherwise it's "page-N"
   // When splitting, the initial "/" becomes the 0th item in the list
 
   const url = new URL(urlString);
-  const pathTokens = url.pathname.split('/');
+  const pathTokens = url.pathname.split("/");
 
   let category;
   let searchQuery;
@@ -69,15 +68,18 @@ export const parsePath = (urlString: string): UrlComponents => {
     category,
     searchQuery,
     page,
-    view: searchParams.get("view") || "list"
+    view: searchParams.get("view") || "list",
   };
-}
+};
 
 export const getListings = (view: string): HTMLCollectionOf<HTMLElement> => {
-  const className = view === "gallery" ? GALLERY_LISTINGS_CLASS_NAME : ROW_LISTINGS_CLASS_NAME;
+  const className =
+    view === "gallery" ? GALLERY_LISTINGS_CLASS_NAME : ROW_LISTINGS_CLASS_NAME;
 
-  return document.getElementsByClassName(className) as HTMLCollectionOf<HTMLElement>;
-}
+  return document.getElementsByClassName(
+    className,
+  ) as HTMLCollectionOf<HTMLElement>;
+};
 
 // export const parseSearchQuery = (): string => {
 //   const searchNode = document.getElementById(SEARCH_TEXTBOX_ID);
@@ -87,18 +89,25 @@ export const getListings = (view: string): HTMLCollectionOf<HTMLElement> => {
 //   return searchNode?.nodeValue || "Unknown";
 // }
 
-export const parseListing = (view: string, listingsNode: HTMLElement): Listing => {
-  const titleNode = listingsNode.getElementsByClassName(view === "gallery" ? GALLERY_LISTING_TITLE_CLASS_NAME: ROW_LISTING_TITLE_CLASS_NAME);
+export const parseListing = (
+  view: string,
+  listingsNode: HTMLElement,
+): Listing => {
+  const titleNode = listingsNode.getElementsByClassName(
+    view === "gallery"
+      ? GALLERY_LISTING_TITLE_CLASS_NAME
+      : ROW_LISTING_TITLE_CLASS_NAME,
+  );
   debug(`Title node: ${titleNode[0].innerHTML}`);
 
   let title = titleNode?.[0]?.innerHTML;
 
   if (!title) {
-    error('Title not found');
+    error("Title not found");
     title = "Unknown";
   }
 
   return {
-    title
-  }
-}
+    title,
+  };
+};

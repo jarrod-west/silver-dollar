@@ -7,7 +7,9 @@
     "build": "tsc --build",
     "build:webpack": "webpack --mode production",
     "lint": "eslint -c ./eslintrc.js src/**/*",
-    "prettier:write": "prettier",
+    "prettier": "prettier 'src/**/*.ts'",
+    "prettier:check": "npm run prettier -- --list-different",
+    "prettier:write": "npm run prettier -- --write",
     "test": "jest",
     "web-ext": "web-ext run"
   },

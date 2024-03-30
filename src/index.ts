@@ -2,12 +2,21 @@ import { debug, info, error } from "./utils/helpers";
 import { parsePath, getListings, parseListing } from "./utils/parsers";
 import { filterListing } from "./filter";
 import { getStoredSetting } from "./settings";
-import { TRANSPARENCY_SETTING, Message, DebugMessage, ErrorMessage, MessageResponse } from "./types";
+import {
+  TRANSPARENCY_SETTING,
+  Message,
+  DebugMessage,
+  ErrorMessage,
+  MessageResponse,
+} from "./types";
 
 // Classes
 const MAIN_RESULTS_CLASS_NAME = "search-results-page__user-ad-collection";
 
-const mutationCallback: MutationCallback = (mutationList: MutationRecord[], _observer: MutationObserver) => {
+const mutationCallback: MutationCallback = (
+  mutationList: MutationRecord[],
+  _observer: MutationObserver,
+) => {
   // Rerun when mutation occurs
   debug(`Mutations occurred: ${mutationList.length}`);
   main();
@@ -31,15 +40,17 @@ const onMessage = async (message: Message): Promise<MessageResponse> => {
       break;
     default:
       error(`Unexpected message type: ${message}`);
-      return {response: "Error"};
-  };
+      return { response: "Error" };
+  }
 
-  return {response: "Success"};
-}
+  return { response: "Success" };
+};
 
 const createDisplayChangeObserver = () => {
   // Listen for changes to the radio button that chooses between "list" and "grid"
-  const targetNode = document.getElementsByClassName(MAIN_RESULTS_CLASS_NAME)?.[0];
+  const targetNode = document.getElementsByClassName(
+    MAIN_RESULTS_CLASS_NAME,
+  )?.[0];
   if (targetNode) {
     debug("Setting mutation observer");
     const config: MutationObserverInit = { attributes: true, subtree: true };
@@ -48,13 +59,13 @@ const createDisplayChangeObserver = () => {
   } else {
     error("Failed to set mutation observer");
   }
-}
+};
 
 const calculateOpacity = async (): Promise<string> => {
   // Inverse of the transparency, converted to a decimal between 0 and 1, then to a string
-  const transparency = await getStoredSetting(TRANSPARENCY_SETTING) as number;
+  const transparency = (await getStoredSetting(TRANSPARENCY_SETTING)) as number;
   return ((100 - transparency) / 100).toString();
-}
+};
 
 export const main = async () => {
   debug("Main");
@@ -73,7 +84,7 @@ export const main = async () => {
       listingNode.style.opacity = opacity;
     }
   }
-}
+};
 
 info("Loaded");
 createDisplayChangeObserver();
