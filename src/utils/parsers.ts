@@ -1,7 +1,6 @@
 import { debug, error } from "./helpers";
 
 // Classes
-const SEARCH_TEXTBOX_ID = "input-search-input";
 const ROW_LISTINGS_CLASS_NAME = "user-ad-row-new-design";
 const GALLERY_LISTINGS_CLASS_NAME = "user-ad-square-new-design";
 const ROW_LISTING_TITLE_CLASS_NAME = "user-ad-row-new-design__title-span";

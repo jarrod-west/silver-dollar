@@ -1,23 +1,17 @@
 
 export const TRANSPARENCY_SETTING = "transparency";
 
-// const SETTINGS = [TRANSPARENCY_SETTING];
-
-// export type SettingsMessage = {
-//   [key: string]: string | number;
-// }
-
 export type BaseMessage = {
   type: "SETTINGS" | "DEBUG" | "ERROR";
 }
 
-export type Settings = {
+export type RawSettings = {
   transparency: number;
   fuzziness: number;
   titleOnly: boolean;
 }
 
-export type SettingsMessage = BaseMessage & Partial<Settings> & {
+export type SettingsMessage = BaseMessage & Partial<RawSettings> & {
   type: "SETTINGS",
 }
 

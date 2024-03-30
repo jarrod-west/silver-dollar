@@ -1,39 +1,14 @@
-import { main } from "./index";
-import { debug, error } from "./utils/helpers";
-import { DebugMessage, ErrorMessage, Message, Settings } from "./types";
+import { debug, error, sendMessageToWindow } from "./utils/helpers";
+import { RawSettings, SettingsMessage, BaseMessage } from "./types";
 
 // Settings
-const DEFAULT_SETTINGS: Settings = {
+const DEFAULT_SETTINGS: RawSettings = {
   transparency: 70,
   fuzziness: 95,
   titleOnly: true
 }
 
-const onMessage = async (message: Message) => {
-  debug(`Message received: ${JSON.stringify(message)}`);
-
-  let { type, ...remainder } = message;
-
-  switch (message.type) {
-    case "SETTINGS":
-      await browser.storage.sync.set(remainder);
-      main();
-      break;
-    case "DEBUG":
-      debug((message as DebugMessage).message);
-      break;
-    case "ERROR":
-      error((message as ErrorMessage).message);
-      break;
-    default:
-      error(`Unexpected message type: ${message}`);
-      return {response: "Error"};
-  };
-
-  return {response: "Success"};
-}
-
-export const getSetting = async (setting: keyof Settings) => {
+export const getStoredSetting = async (setting: keyof RawSettings) => {
   const settingNode = await browser.storage.sync.get(setting);
 
   if (!settingNode) {
@@ -43,7 +18,7 @@ export const getSetting = async (setting: keyof Settings) => {
   return settingNode[setting];
 }
 
-export const getSettings = async (): Promise<Settings> => {
+export const getStoredSettings = async (): Promise<RawSettings> => {
   const settings = await browser.storage.sync.get(null);
 
   // Add any defaults
@@ -53,7 +28,52 @@ export const getSettings = async (): Promise<Settings> => {
     }
   })
 
-  return settings as Settings;
+  return settings as RawSettings;
 }
 
-browser.runtime.onMessage.addListener(onMessage);
+export class PopupSetting {
+  private name: keyof RawSettings;
+  private uiType: string;
+  private uiName: string;
+  private uiElement: HTMLInputElement;
+  private valid: boolean;
+
+  constructor(
+    name: keyof RawSettings,
+    uiType: string,
+    initialSettings: RawSettings,
+  ) {
+    this.name = name;
+    this.uiType = uiType;
+    this.uiName = `${name}-${uiType}`;
+    this.uiElement = document.getElementById(this.uiName) as HTMLInputElement;
+    this.valid = this.uiElement ? true : false;
+    if (!this.valid) {
+      error(`Error initialising setting: ${this.name}`);
+    }
+    this.initialise(initialSettings);
+  }
+
+  private async initialise(initialSettings: RawSettings) {
+    if (this.valid) {
+      // Change Handler
+      this.uiElement.addEventListener("change", async (_event: Event) => {
+        debug(`Value for ${this.uiName} changed`);
+
+        let message: Record<string, string | number | boolean> = {
+          type: "SETTINGS"
+        };
+        message[this.name] = this.uiType === "checkbox" ? this.uiElement.checked : this.uiElement.value;
+
+        await sendMessageToWindow(message as SettingsMessage);
+      });
+
+      // Initial Value
+      if (this.uiType === "checkbox") {
+        this.uiElement.checked = initialSettings[this.name] as boolean;
+      } else {
+        this.uiElement.value = initialSettings[this.name].toString();
+      }
+    }
+  }
+}

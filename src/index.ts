@@ -1,8 +1,8 @@
 import { debug, info, error } from "./utils/helpers";
 import { parsePath, getListings, parseListing } from "./utils/parsers";
 import { filterListing } from "./filter";
-import { getSetting } from "./settings";
-import { TRANSPARENCY_SETTING } from "./types";
+import { getStoredSetting } from "./settings";
+import { TRANSPARENCY_SETTING, Message, DebugMessage, ErrorMessage } from "./types";
 
 // Classes
 const MAIN_RESULTS_CLASS_NAME = "search-results-page__user-ad-collection";
@@ -13,6 +13,29 @@ const mutationCallback: MutationCallback = (mutationList: MutationRecord[], _obs
   main();
 };
 
+const onMessage = async (message: Message) => {
+  debug(`Message received: ${JSON.stringify(message)}`);
+
+  let { type, ...remainder } = message;
+
+  switch (message.type) {
+    case "SETTINGS":
+      await browser.storage.sync.set(remainder);
+      main();
+      break;
+    case "DEBUG":
+      debug((message as DebugMessage).message);
+      break;
+    case "ERROR":
+      error((message as ErrorMessage).message);
+      break;
+    default:
+      error(`Unexpected message type: ${message}`);
+      return {response: "Error"};
+  };
+
+  return {response: "Success"};
+}
 
 const createDisplayChangeObserver = () => {
   // Listen for changes to the radio button that chooses between "list" and "grid"
@@ -29,7 +52,7 @@ const createDisplayChangeObserver = () => {
 
 const calculateOpacity = async (): Promise<string> => {
   // Inverse of the transparency, converted to a decimal between 0 and 1, then to a string
-  const transparency = await getSetting(TRANSPARENCY_SETTING);
+  const transparency = await getStoredSetting(TRANSPARENCY_SETTING) as number;
   return ((100 - transparency) / 100).toString();
 }
 
@@ -54,4 +77,5 @@ export const main = async () => {
 
 info("Loaded");
 createDisplayChangeObserver();
+browser.runtime.onMessage.addListener(onMessage);
 main(); // TODO: Do on-load
