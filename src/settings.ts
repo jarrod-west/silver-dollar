@@ -16,7 +16,7 @@ export const getStoredSetting = async (setting: keyof RawSettings) => {
     return DEFAULT_SETTINGS[setting];
   }
 
-  return settingNode[setting] as string | number;
+  return settingNode[setting] as number | boolean;
 };
 
 export const getStoredSettings = async (): Promise<RawSettings> => {
@@ -55,10 +55,26 @@ export class PopupSetting {
     this.initialise(initialSettings);
   }
 
+  public addChangeEventListener(callback: (event: Event) => void) {
+    this.uiElement.addEventListener("change", callback);
+  }
+
+  public setUiEnabled(enabled: boolean) {
+    this.uiElement.disabled = !enabled;
+  }
+
+  public getUiValue(): boolean | number {
+    if (this.uiType === "checkbox") {
+      return this.uiElement.checked;
+    } else {
+      return parseInt(this.uiElement.value);
+    }
+  }
+
   private initialise(initialSettings: RawSettings) {
     if (this.valid) {
       // Change Handler
-      this.uiElement.addEventListener("change", (_event: Event) => {
+      this.addChangeEventListener((_event: Event) => {
         debug(`Value for ${this.uiName} changed`);
 
         const message: Record<string, string | number | boolean> = {
@@ -67,7 +83,7 @@ export class PopupSetting {
         message[this.name] =
           this.uiType === "checkbox"
             ? this.uiElement.checked
-            : this.uiElement.value;
+            : parseInt(this.uiElement.value);
 
         sendMessageToWindow(message as SettingsMessage).catch((err) =>
           error(`Error sending message: ${(err as Error).message}`),
@@ -79,6 +95,13 @@ export class PopupSetting {
         this.uiElement.checked = initialSettings[this.name] as boolean;
       } else {
         this.uiElement.value = initialSettings[this.name].toString();
+      }
+
+      // Initial enabled/disabled
+      if (this.name === "enabled") {
+        this.setUiEnabled(true);
+      } else {
+        this.setUiEnabled(initialSettings.enabled);
       }
     }
   }

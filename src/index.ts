@@ -2,10 +2,7 @@ import { debug, info, error, devBuild } from "./utils/helpers";
 import { Listing, parsePath, getListings, parseListing } from "./utils/parsers";
 import { filterListings } from "./filter";
 import { getStoredSettings } from "./settings";
-import {
-  Message,
-  MessageResponse,
-} from "./types";
+import { Message, MessageResponse } from "./types";
 
 // Classes
 const MAIN_RESULTS_CLASS_NAME = "search-results-page__user-ad-collection";
@@ -64,21 +61,6 @@ const createMessageListener = () => {
   browser.runtime.onMessage.addListener(onMessage);
 };
 
-// const getOpacity = async (): Promise<string> => {
-//   // Inverse of the transparency, converted to a decimal between 0 and 1, then to a string
-//   const transparency = (await getStoredSetting(TRANSPARENCY_SETTING)) as number;
-//   return ((100 - transparency) / 100).toString();
-// };
-
-// const getFuzziness = async (): Promise<number> => {
-//   const fuzziness = (await getStoredSetting(FUZZINESS_SETTING)) as number;
-//   return fuzziness / 100;
-// };
-
-// const getTitleOnly = async (): Promise<boolean> => {
-//   return (await getStoredSetting(TITLE_ONLY_SETTING)) as boolean;
-// };
-
 export const main = async () => {
   debug("Main");
 
@@ -100,7 +82,7 @@ export const main = async () => {
   debug(`Retrieved stored settings: ${JSON.stringify(settingsValues)}`);
 
   const opacity = ((100 - settingsValues.transparency) / 100).toString(); // Inverse of the transparency setting
-  const fuzziness = (settingsValues.fuzziness as number) / 100;
+  const fuzziness = settingsValues.fuzziness / 100;
 
   let matchingListings: Listing[]; // Ones to make opaque
   let filteredListings: Listing[]; // Ones to make transparent
@@ -108,7 +90,7 @@ export const main = async () => {
   if (settingsValues.enabled) {
     matchingListings = filterListings(
       urlComponents.searchQuery,
-      fuzziness as number,
+      fuzziness,
       settingsValues.titleOnly,
       listings,
     ).map((listing) => listing.item);
@@ -120,7 +102,9 @@ export const main = async () => {
     filteredListings = [];
   }
 
-  debug(`Matching: ${matchingListings.length}. Filtered: ${filterListings.length}`);
+  debug(
+    `Matching: ${matchingListings.length}. Filtered: ${filterListings.length}`,
+  );
 
   // Set the filtered-out listings to the reduced opacity
   for (const listing of filteredListings) {
