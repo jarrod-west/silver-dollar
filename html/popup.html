@@ -5,11 +5,28 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="page-choice">developer.mozilla.org</div>
-    <div class="page-choice">support.mozilla.org</div>
-    <div class="page-choice">addons.mozilla.org</div>
-    <div class="transparency-slider">
-      <input type="range" min="0" max="100" value="70" class="slider" id="transparency-slider">
+    <h3>Settings</h3>
+    <!-- <div class="transparency-slider">
+      <p>Opacity</p>
+      <input type="range" min="0" max="100" class="slider" id="transparency-slider">
+    </div> -->
+    <div class="settings-grid">
+      <!-- <div class="left-column"> -->
+        <!-- <div class="row">Opacity</div>
+        <div class="row">Fuzziness</div> -->
+        <div class="row-text">Opacity</div>
+        <input type="range" min="0" max="100" class="slider" id="transparency-slider">
+        <div class="row-text">Fuzziness</div>
+      <!-- </div> -->
+      <!-- <div class="right-column"> -->
+        <!-- <div class="row"> -->
+          <!-- <input type="range" min="0" max="100" class="slider" id="transparency-slider"> -->
+        <!-- </div>
+        <div class="row">
+          Thing2 -->
+          <input type="range" min="0" max="100" class="slider" id="fuzziness-slider">
+        <!-- </div> -->
+      <!-- </div> -->
     </div>
     <script src="../popup.js"></script>
   </body>
