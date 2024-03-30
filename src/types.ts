@@ -1,4 +1,5 @@
 export const TRANSPARENCY_SETTING = "transparency";
+export const FUZZINESS_SETTING = "fuzziness";
 
 export type BaseMessage = {
   type: "SETTINGS" | "DEBUG" | "ERROR";

@@ -16,6 +16,7 @@ export type UrlComponents = {
 };
 
 export type Listing = {
+  htmlNode: HTMLElement,
   title: string;
 };
 
@@ -108,6 +109,7 @@ export const parseListing = (
   }
 
   return {
+    htmlNode: listingsNode,
     title,
   };
 };

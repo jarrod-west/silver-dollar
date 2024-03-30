@@ -4,6 +4,7 @@ import { filterListing } from "./filter";
 import { getStoredSetting } from "./settings";
 import {
   TRANSPARENCY_SETTING,
+  FUZZINESS_SETTING,
   Message,
   DebugMessage,
   ErrorMessage,
@@ -81,16 +82,23 @@ export const main = async () => {
 
   const urlComponents = parsePath(document.URL);
   const listingsNode = getListings(urlComponents.view);
+  const listings = Array.from(listingsNode).map(listing => parseListing(urlComponents.view, listing));
 
   debug(`Found ${listingsNode.length} listings`);
   const opacity = await calculateOpacity();
+  const fuzziness = await getStoredSetting(FUZZINESS_SETTING);
 
   for (const listingNode of listingsNode) {
     const listing = parseListing(urlComponents.view, listingNode);
-    if (filterListing(urlComponents.searchQuery, listing)) {
+    if (filterListing(urlComponents.searchQuery, fuzziness, listing)) {
       listingNode.style.opacity = opacity;
     }
   }
+
+  // const filteredListings = filterListings(urlComponents.searchQuery, fuzziness, listings);
+  // for (const listing of filteredListings) {
+  //   listing.item.htmlNode.style.opacity = opacity;
+  // }
 };
 
 info("Loaded");
