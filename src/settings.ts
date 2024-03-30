@@ -3,6 +3,7 @@ import { RawSettings, SettingsMessage } from "./types";
 
 // Settings
 const DEFAULT_SETTINGS: RawSettings = {
+  enabled: true,
   transparency: 70,
   fuzziness: 35,
   titleOnly: true,

@@ -11,6 +11,7 @@ getStoredSettings()
     }).catch((err) =>
       error(`Error sending message: ${(err as Error).message}`),
     );
+    new PopupSetting("enabled", "checkbox", settings);
     new PopupSetting("transparency", "slider", settings);
     new PopupSetting("fuzziness", "slider", settings);
     new PopupSetting("titleOnly", "checkbox", settings);

@@ -1,11 +1,8 @@
 import { debug, info, error, devBuild } from "./utils/helpers";
-import { parsePath, getListings, parseListing } from "./utils/parsers";
+import { Listing, parsePath, getListings, parseListing } from "./utils/parsers";
 import { filterListings } from "./filter";
-import { getStoredSetting } from "./settings";
+import { getStoredSettings } from "./settings";
 import {
-  TRANSPARENCY_SETTING,
-  FUZZINESS_SETTING,
-  TITLE_ONLY_SETTING,
   Message,
   MessageResponse,
 } from "./types";
@@ -67,20 +64,20 @@ const createMessageListener = () => {
   browser.runtime.onMessage.addListener(onMessage);
 };
 
-const getOpacity = async (): Promise<string> => {
-  // Inverse of the transparency, converted to a decimal between 0 and 1, then to a string
-  const transparency = (await getStoredSetting(TRANSPARENCY_SETTING)) as number;
-  return ((100 - transparency) / 100).toString();
-};
+// const getOpacity = async (): Promise<string> => {
+//   // Inverse of the transparency, converted to a decimal between 0 and 1, then to a string
+//   const transparency = (await getStoredSetting(TRANSPARENCY_SETTING)) as number;
+//   return ((100 - transparency) / 100).toString();
+// };
 
-const getFuzziness = async (): Promise<number> => {
-  const fuzziness = (await getStoredSetting(FUZZINESS_SETTING)) as number;
-  return fuzziness / 100;
-};
+// const getFuzziness = async (): Promise<number> => {
+//   const fuzziness = (await getStoredSetting(FUZZINESS_SETTING)) as number;
+//   return fuzziness / 100;
+// };
 
-const getTitleOnly = async (): Promise<boolean> => {
-  return (await getStoredSetting(TITLE_ONLY_SETTING)) as boolean;
-};
+// const getTitleOnly = async (): Promise<boolean> => {
+//   return (await getStoredSetting(TITLE_ONLY_SETTING)) as boolean;
+// };
 
 export const main = async () => {
   debug("Main");
@@ -97,22 +94,35 @@ export const main = async () => {
   );
 
   debug(`Found ${listingsNode.length} listings`);
-  const opacity = await getOpacity();
-  const fuzziness = await getFuzziness();
-  const titleOnly = await getTitleOnly();
 
-  // Get the filtered-in listings, then use that to get the filtered-out ones
-  const matchingListings = filterListings(
-    urlComponents.searchQuery,
-    fuzziness,
-    titleOnly,
-    listings,
-  ).map((listing) => listing.item);
-  const filteredListings = listings.filter(
-    (listing) => !matchingListings.includes(listing),
-  );
+  const settingsValues = await getStoredSettings();
 
-  // Set the filtered-out listings to the opacity
+  debug(`Retrieved stored settings: ${JSON.stringify(settingsValues)}`);
+
+  const opacity = ((100 - settingsValues.transparency) / 100).toString(); // Inverse of the transparency setting
+  const fuzziness = (settingsValues.fuzziness as number) / 100;
+
+  let matchingListings: Listing[]; // Ones to make opaque
+  let filteredListings: Listing[]; // Ones to make transparent
+
+  if (settingsValues.enabled) {
+    matchingListings = filterListings(
+      urlComponents.searchQuery,
+      fuzziness as number,
+      settingsValues.titleOnly,
+      listings,
+    ).map((listing) => listing.item);
+    filteredListings = listings.filter(
+      (listing) => !matchingListings.includes(listing),
+    );
+  } else {
+    matchingListings = listings;
+    filteredListings = [];
+  }
+
+  debug(`Matching: ${matchingListings.length}. Filtered: ${filterListings.length}`);
+
+  // Set the filtered-out listings to the reduced opacity
   for (const listing of filteredListings) {
     listing.htmlNode.style.opacity = opacity;
   }
