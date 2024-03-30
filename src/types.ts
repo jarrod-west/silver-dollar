@@ -5,6 +5,10 @@ export type BaseMessage = {
   type: "SETTINGS" | "DEBUG" | "ERROR";
 }
 
+export type MessageResponse = {
+  response: "Success" | "Error";
+}
+
 export type RawSettings = {
   transparency: number;
   fuzziness: number;

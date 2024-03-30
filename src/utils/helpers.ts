@@ -1,4 +1,4 @@
-import { Message } from "../types";
+import { Message, MessageResponse } from "../types";
 
 // TODO: Improve
 export const info = (msg: string) => {
@@ -18,10 +18,14 @@ export const sendMessageToWindow = async (message: Message): Promise<void> => {
     const tabs = await browser.tabs.query({currentWindow: true, active: true});
 
     for (const tab of tabs) {
-      const response = await browser.tabs.sendMessage(tab.id as number, message);
-      debug(`Message sent, response: ${response.response}`);
+      if (tab.id) {
+        const response = await browser.tabs.sendMessage(tab.id, message) as MessageResponse;
+        debug(`Message sent, response: ${response.response}`);
+      } else {
+        error(`No ID for tab: ${JSON.stringify(tab)}`);
+      }
     }
   } catch (err) {
-    error(`Error sending message: ${err}`);
+    error(`Error sending message: ${(err as Error).message}`);
   }
 }

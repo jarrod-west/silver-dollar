@@ -6,7 +6,7 @@ const GALLERY_LISTINGS_CLASS_NAME = "user-ad-square-new-design";
 const ROW_LISTING_TITLE_CLASS_NAME = "user-ad-row-new-design__title-span";
 const GALLERY_LISTING_TITLE_CLASS_NAME = "user-ad-square-new-design__title";
 
-const PAGE_REGEX = new RegExp(/^page\-(\d+)$/);
+const PAGE_REGEX = new RegExp(/^page-(\d+)$/);
 
 export type UrlComponents = {
   category?: string;

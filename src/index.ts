@@ -2,7 +2,7 @@ import { debug, info, error } from "./utils/helpers";
 import { parsePath, getListings, parseListing } from "./utils/parsers";
 import { filterListing } from "./filter";
 import { getStoredSetting } from "./settings";
-import { TRANSPARENCY_SETTING, Message, DebugMessage, ErrorMessage } from "./types";
+import { TRANSPARENCY_SETTING, Message, DebugMessage, ErrorMessage, MessageResponse } from "./types";
 
 // Classes
 const MAIN_RESULTS_CLASS_NAME = "search-results-page__user-ad-collection";
@@ -13,7 +13,7 @@ const mutationCallback: MutationCallback = (mutationList: MutationRecord[], _obs
   main();
 };
 
-const onMessage = async (message: Message) => {
+const onMessage = async (message: Message): Promise<MessageResponse> => {
   debug(`Message received: ${JSON.stringify(message)}`);
 
   let { type, ...remainder } = message;
