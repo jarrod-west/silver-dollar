@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc --build",
-    "build:webpack": "webpack --mode production",
+    "build:webpack": "webpack",
     "lint": "eslint -c ./eslintrc.js src/**/*",
     "prettier": "prettier 'src/**/*.ts'",
     "prettier:check": "npm run prettier -- --list-different",

@@ -1,16 +1,22 @@
 import { Message, MessageResponse } from "../types";
 
+export const devBuild = (): boolean => {
+  return process.env.NODE_ENV === "development";
+};
+
 // TODO: Improve
 export const info = (msg: string) => {
-  console.log(`[Silver Dollar] ${msg}`);
+  console.log(`[Silver Dollar: Info] ${msg}`);
 };
 
 export const debug = (msg: string) => {
-  console.log(`[Silver Dollar] ${msg}`);
+  if (devBuild()) {
+    console.log(`[Silver Dollar: Debug] ${msg}`);
+  }
 };
 
 export const error = (msg: string) => {
-  console.error(`[Silver Dollar] ${msg}`);
+  console.error(`[Silver Dollar: Error] ${msg}`);
 };
 
 export const sendMessageToWindow = async (message: Message): Promise<void> => {

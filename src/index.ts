@@ -1,4 +1,4 @@
-import { debug, info, error } from "./utils/helpers";
+import { debug, info, error, devBuild } from "./utils/helpers";
 import { parsePath, getListings, parseListing } from "./utils/parsers";
 import { filterListing } from "./filter";
 import { getStoredSetting } from "./settings";
@@ -73,8 +73,11 @@ const calculateOpacity = async (): Promise<string> => {
 
 export const main = async () => {
   debug("Main");
-  // Leave this in to make it clear the extension loaded
-  document.body.style.border = "5px solid red";
+
+  if (devBuild()) {
+    // Easy visual indicator that the extension has loaded
+    document.body.style.border = "5px solid red";
+  }
 
   const urlComponents = parsePath(document.URL);
   const listingsNode = getListings(urlComponents.view);
