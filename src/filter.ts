@@ -5,16 +5,22 @@ import Fuse from "fuse.js";
 export const filterListings = (
   searchQuery: string,
   fuzziness: number,
+  titleOnly: boolean,
   listings: Listing[],
 ) => {
   debug(
     `Filtering on searchQuery: ${searchQuery} with threshold: ${fuzziness}`,
   );
+
+  const keys = ["title"];
+  if (!titleOnly) {
+    keys.push("summary");
+  }
+
   const fuse = new Fuse(listings, {
     ignoreLocation: true, // Include results anywhere in the string
-    keys: ["title"],
     threshold: fuzziness,
-    // TODO: Optional "summary" key
+    keys,
   });
 
   return fuse.search(searchQuery);

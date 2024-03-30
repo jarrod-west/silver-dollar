@@ -5,6 +5,7 @@ import { getStoredSetting } from "./settings";
 import {
   TRANSPARENCY_SETTING,
   FUZZINESS_SETTING,
+  TITLE_ONLY_SETTING,
   Message,
   MessageResponse,
 } from "./types";
@@ -19,7 +20,7 @@ const mutationCallback: MutationCallback = (
   // Rerun when mutation occurs
   debug(`Mutations occurred: ${mutationList.length}`);
   main().catch((err) =>
-    error(`Error calling main on muation: ${(err as Error).message}`),
+    error(`Error calling main on mutation: ${(err as Error).message}`),
   );
 };
 
@@ -66,15 +67,19 @@ const createMessageListener = () => {
   browser.runtime.onMessage.addListener(onMessage);
 };
 
-const calculateOpacity = async (): Promise<string> => {
+const getOpacity = async (): Promise<string> => {
   // Inverse of the transparency, converted to a decimal between 0 and 1, then to a string
   const transparency = (await getStoredSetting(TRANSPARENCY_SETTING)) as number;
   return ((100 - transparency) / 100).toString();
 };
 
-const calculateFuzziness = async (): Promise<number> => {
+const getFuzziness = async (): Promise<number> => {
   const fuzziness = (await getStoredSetting(FUZZINESS_SETTING)) as number;
   return fuzziness / 100;
+};
+
+const getTitleOnly = async (): Promise<boolean> => {
+  return (await getStoredSetting(TITLE_ONLY_SETTING)) as boolean;
 };
 
 export const main = async () => {
@@ -92,13 +97,15 @@ export const main = async () => {
   );
 
   debug(`Found ${listingsNode.length} listings`);
-  const opacity = await calculateOpacity();
-  const fuzziness = await calculateFuzziness();
+  const opacity = await getOpacity();
+  const fuzziness = await getFuzziness();
+  const titleOnly = await getTitleOnly();
 
   // Get the filtered-in listings, then use that to get the filtered-out ones
   const matchingListings = filterListings(
     urlComponents.searchQuery,
     fuzziness,
+    titleOnly,
     listings,
   ).map((listing) => listing.item);
   const filteredListings = listings.filter(
@@ -122,5 +129,5 @@ createMessageListener();
 
 // TODO: Do on-load
 main().catch((err) =>
-  error(`Error calling main on muation: ${(err as Error).message}`),
+  error(`Error calling main on start: ${(err as Error).message}`),
 );

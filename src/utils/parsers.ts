@@ -1,23 +1,37 @@
 import { debug, error } from "./helpers";
 
 // Classes
-const ROW_LISTINGS_CLASS_NAME = "user-ad-row-new-design";
-const GALLERY_LISTINGS_CLASS_NAME = "user-ad-square-new-design";
-const ROW_LISTING_TITLE_CLASS_NAME = "user-ad-row-new-design__title-span";
-const GALLERY_LISTING_TITLE_CLASS_NAME = "user-ad-square-new-design__title";
+const CLASSES = {
+  gallery: {
+    listingsClassName: "user-ad-square-new-design",
+    titleClassName: "user-ad-square-new-design__title",
+    summaryClassName: [
+      "user-ad-square-new-design__description user-ad-square-new-design__description--two-lines",
+      "user-ad-square-new-design__description",
+    ],
+  },
+  list: {
+    listingsClassName: "user-ad-row-new-design",
+    titleClassName: "user-ad-row-new-design__title-span",
+    summaryClassName: ["user-ad-row-new-design__description-text"],
+  },
+};
 
 const PAGE_REGEX = new RegExp(/^page-(\d+)$/);
+
+type View = "gallery" | "list";
 
 export type UrlComponents = {
   category?: string;
   searchQuery: string;
   page: number;
-  view: string;
+  view: View;
 };
 
 export type Listing = {
   htmlNode: HTMLElement;
   title: string;
+  summary: string;
 };
 
 export const parsePath = (urlString: string): UrlComponents => {
@@ -69,47 +83,54 @@ export const parsePath = (urlString: string): UrlComponents => {
     category,
     searchQuery,
     page,
-    view: searchParams.get("view") || "list",
+    view: (searchParams.get("view") || "list") as View,
   };
 };
 
-export const getListings = (view: string): HTMLCollectionOf<HTMLElement> => {
-  const className =
-    view === "gallery" ? GALLERY_LISTINGS_CLASS_NAME : ROW_LISTINGS_CLASS_NAME;
+export const getListings = (view: View): HTMLCollectionOf<HTMLElement> => {
+  const className = CLASSES[view].listingsClassName;
 
   return document.getElementsByClassName(
     className,
   ) as HTMLCollectionOf<HTMLElement>;
 };
 
-// export const parseSearchQuery = (): string => {
-//   const searchNode = document.getElementById(SEARCH_TEXTBOX_ID);
+const getByClassName = (
+  view: View,
+  type: "title" | "summary",
+  parentNode: HTMLElement,
+) => {
+  // Retrieve an item by class name
+  let classes = CLASSES[view][`${type}ClassName`];
 
-//   debug(`Search query: ${searchNode}`);
+  if (!Array.isArray(classes)) {
+    classes = [classes];
+  }
 
-//   return searchNode?.nodeValue || "Unknown";
-// }
+  for (const className of classes) {
+    const value = parentNode.getElementsByClassName(className)?.[0]?.innerHTML;
+    if (value) {
+      return value;
+    }
+  }
+
+  error(`Couldn't find class for ${type}`);
+
+  return "Unknown";
+};
 
 export const parseListing = (
-  view: string,
+  view: View,
   listingsNode: HTMLElement,
 ): Listing => {
-  const titleNode = listingsNode.getElementsByClassName(
-    view === "gallery"
-      ? GALLERY_LISTING_TITLE_CLASS_NAME
-      : ROW_LISTING_TITLE_CLASS_NAME,
-  );
-  debug(`Title node: ${titleNode[0].innerHTML}`);
-
-  let title = titleNode?.[0]?.innerHTML;
-
-  if (!title) {
-    error("Title not found");
-    title = "Unknown";
-  }
+  const title = getByClassName(view, "title", listingsNode);
+  const summary = getByClassName(view, "summary", listingsNode);
+  debug(`Title: ${title}`);
+  debug(`Summary: ${summary}`);
 
   return {
     htmlNode: listingsNode,
     title,
+    summary,
   };
 };
