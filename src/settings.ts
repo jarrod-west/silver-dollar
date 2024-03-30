@@ -1,10 +1,10 @@
 import { debug, error, sendMessageToWindow } from "./utils/helpers";
-import { RawSettings, SettingsMessage, BaseMessage } from "./types";
+import { RawSettings, SettingsMessage } from "./types";
 
 // Settings
 const DEFAULT_SETTINGS: RawSettings = {
   transparency: 70,
-  fuzziness: 95,
+  fuzziness: 35,
   titleOnly: true,
 };
 
@@ -15,7 +15,7 @@ export const getStoredSetting = async (setting: keyof RawSettings) => {
     return DEFAULT_SETTINGS[setting];
   }
 
-  return settingNode[setting];
+  return settingNode[setting] as string | number;
 };
 
 export const getStoredSettings = async (): Promise<RawSettings> => {
@@ -49,18 +49,18 @@ export class PopupSetting {
     this.uiElement = document.getElementById(this.uiName) as HTMLInputElement;
     this.valid = this.uiElement ? true : false;
     if (!this.valid) {
-      error(`Error initialising setting: ${this.name}`);
+      error(`Error initialising setting "${this.name}"`);
     }
     this.initialise(initialSettings);
   }
 
-  private async initialise(initialSettings: RawSettings) {
+  private initialise(initialSettings: RawSettings) {
     if (this.valid) {
       // Change Handler
-      this.uiElement.addEventListener("change", async (_event: Event) => {
+      this.uiElement.addEventListener("change", (_event: Event) => {
         debug(`Value for ${this.uiName} changed`);
 
-        let message: Record<string, string | number | boolean> = {
+        const message: Record<string, string | number | boolean> = {
           type: "SETTINGS",
         };
         message[this.name] =
@@ -68,7 +68,9 @@ export class PopupSetting {
             ? this.uiElement.checked
             : this.uiElement.value;
 
-        await sendMessageToWindow(message as SettingsMessage);
+        sendMessageToWindow(message as SettingsMessage).catch((err) =>
+          error(`Error sending message: ${(err as Error).message}`),
+        );
       });
 
       // Initial Value

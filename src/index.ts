@@ -1,13 +1,11 @@
 import { debug, info, error, devBuild } from "./utils/helpers";
 import { parsePath, getListings, parseListing } from "./utils/parsers";
-import { filterListing } from "./filter";
+import { filterListings } from "./filter";
 import { getStoredSetting } from "./settings";
 import {
   TRANSPARENCY_SETTING,
   FUZZINESS_SETTING,
   Message,
-  DebugMessage,
-  ErrorMessage,
   MessageResponse,
 } from "./types";
 
@@ -20,27 +18,29 @@ const mutationCallback: MutationCallback = (
 ) => {
   // Rerun when mutation occurs
   debug(`Mutations occurred: ${mutationList.length}`);
-  main();
+  main().catch((err) =>
+    error(`Error calling main on muation: ${(err as Error).message}`),
+  );
 };
 
 const onMessage = async (message: Message): Promise<MessageResponse> => {
   debug(`Message received: ${JSON.stringify(message)}`);
 
-  let { type, ...remainder } = message;
+  const { type, ...remainder } = message;
 
-  switch (message.type) {
+  switch (type) {
     case "SETTINGS":
       await browser.storage.sync.set(remainder);
-      main();
+      await main();
       break;
     case "DEBUG":
-      debug((message as DebugMessage).message);
+      debug(message.message);
       break;
     case "ERROR":
-      error((message as ErrorMessage).message);
+      error(message.message);
       break;
     default:
-      error(`Unexpected message type: ${message}`);
+      error(`Unexpected message type: ${JSON.stringify(message)}`);
       return { response: "Error" };
   }
 
@@ -72,6 +72,11 @@ const calculateOpacity = async (): Promise<string> => {
   return ((100 - transparency) / 100).toString();
 };
 
+const calculateFuzziness = async (): Promise<number> => {
+  const fuzziness = (await getStoredSetting(FUZZINESS_SETTING)) as number;
+  return fuzziness / 100;
+};
+
 export const main = async () => {
   debug("Main");
 
@@ -82,26 +87,40 @@ export const main = async () => {
 
   const urlComponents = parsePath(document.URL);
   const listingsNode = getListings(urlComponents.view);
-  const listings = Array.from(listingsNode).map(listing => parseListing(urlComponents.view, listing));
+  const listings = Array.from(listingsNode).map((listing) =>
+    parseListing(urlComponents.view, listing),
+  );
 
   debug(`Found ${listingsNode.length} listings`);
   const opacity = await calculateOpacity();
-  const fuzziness = await getStoredSetting(FUZZINESS_SETTING);
+  const fuzziness = await calculateFuzziness();
 
-  for (const listingNode of listingsNode) {
-    const listing = parseListing(urlComponents.view, listingNode);
-    if (filterListing(urlComponents.searchQuery, fuzziness, listing)) {
-      listingNode.style.opacity = opacity;
-    }
+  // Get the filtered-in listings, then use that to get the filtered-out ones
+  const matchingListings = filterListings(
+    urlComponents.searchQuery,
+    fuzziness,
+    listings,
+  ).map((listing) => listing.item);
+  const filteredListings = listings.filter(
+    (listing) => !matchingListings.includes(listing),
+  );
+
+  // Set the filtered-out listings to the opacity
+  for (const listing of filteredListings) {
+    listing.htmlNode.style.opacity = opacity;
   }
 
-  // const filteredListings = filterListings(urlComponents.searchQuery, fuzziness, listings);
-  // for (const listing of filteredListings) {
-  //   listing.item.htmlNode.style.opacity = opacity;
-  // }
+  // Reset the matching listings to 100% opacity
+  for (const listing of matchingListings) {
+    listing.htmlNode.style.opacity = "1";
+  }
 };
 
 info("Loaded");
 createDisplayChangeObserver();
 createMessageListener();
-main(); // TODO: Do on-load
+
+// TODO: Do on-load
+main().catch((err) =>
+  error(`Error calling main on muation: ${(err as Error).message}`),
+);
