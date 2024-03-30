@@ -7,21 +7,28 @@ export const TRANSPARENCY_SETTING = "transparency";
 //   [key: string]: string | number;
 // }
 
-export type Message = {
+export type BaseMessage = {
   type: "SETTINGS" | "DEBUG" | "ERROR";
 }
 
-export type SettingsMessage = Message & {
-  type: "SETTINGS",
-  transparency?: number;
+export type Settings = {
+  transparency: number;
+  fuzziness: number;
+  titleOnly: boolean;
 }
 
-export type DebugMessage = Message & {
+export type SettingsMessage = BaseMessage & Partial<Settings> & {
+  type: "SETTINGS",
+}
+
+export type DebugMessage = BaseMessage & {
   type: "DEBUG";
   message: string;
 }
 
-export type ErrorMessage = Message & {
+export type ErrorMessage = BaseMessage & {
   type: "ERROR";
   message: string;
 }
+
+export type Message = SettingsMessage | DebugMessage | ErrorMessage;

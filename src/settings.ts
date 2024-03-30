@@ -1,36 +1,13 @@
 import { main } from "./index";
-import { debug, info, error } from "./utils/helpers";
-import { DebugMessage, Message, SettingsMessage } from "./types";
+import { debug, error } from "./utils/helpers";
+import { DebugMessage, ErrorMessage, Message, Settings } from "./types";
 
 // Settings
-const DEFAULT_SETTINGS: SettingsMessage = {
-  type: "SETTINGS", // TODO
+const DEFAULT_SETTINGS: Settings = {
   transparency: 70,
+  fuzziness: 95,
+  titleOnly: true
 }
-
-// const setInitialSettings = async () => {
-//   const currentStorage = await browser.storage.sync.get();
-//   // Object.entries(DEFAULT_SETTINGS).forEach(([key, value]) => {
-//   //   if (!currentStorage[key]) {
-//   //     await browser.storage.sync.set({key: value});
-//   //   }
-//   // });
-
-//   // Object.keys(DEFAULT_SETTINGS).filter(key => !(currentStorage.keys().includes(key)))
-//   //   .reduce( (res, key) => (res[key] = DEFAULT_SETTINGS[key], res), {} );
-
-//   const unset = Object.fromEntries(Object.entries(DEFAULT_SETTINGS).filter(([key, _value]) => !currentStorage.keys().includes(key)));
-//   await browser.storage.sync.set(unset);
-// }
-
-// const onSettingsMessage = async (message: SettingsMessage) => {
-//   debug(`Message received: ${JSON.stringify(message)}`);
-//   await browser.storage.sync.set(message);
-
-//   main();
-
-//   return {response: "Response from content"};
-// }
 
 const onMessage = async (message: Message) => {
   debug(`Message received: ${JSON.stringify(message)}`);
@@ -46,17 +23,17 @@ const onMessage = async (message: Message) => {
       debug((message as DebugMessage).message);
       break;
     case "ERROR":
-      error((message as DebugMessage).message);
+      error((message as ErrorMessage).message);
       break;
     default:
-      error(`Unexpected message type: ${message.type}`);
+      error(`Unexpected message type: ${message}`);
       return {response: "Error"};
   };
 
   return {response: "Success"};
 }
 
-export const getSetting = async (setting: keyof SettingsMessage) => {
+export const getSetting = async (setting: keyof Settings) => {
   const settingNode = await browser.storage.sync.get(setting);
 
   if (!settingNode) {
@@ -66,19 +43,17 @@ export const getSetting = async (setting: keyof SettingsMessage) => {
   return settingNode[setting];
 }
 
-export const getSettings = async () => {
+export const getSettings = async (): Promise<Settings> => {
   const settings = await browser.storage.sync.get(null);
 
   // Add any defaults
   Object.entries(DEFAULT_SETTINGS).forEach(([key, value]) => {
-    if (!settings.keys().includes(key)) {
+    if (!(Object.keys(settings).includes(key))) {
       settings[key] = value;
     }
   })
 
-  return settings;
+  return settings as Settings;
 }
 
 browser.runtime.onMessage.addListener(onMessage);
-
-// setInitialSettings();

@@ -1,15 +1,8 @@
 import { debug, error } from "./utils/helpers";
-import { getSetting, getSettings } from "./settings";
+import { getSettings } from "./settings";
+import { Message, Settings } from "./types";
 
-// const getEventTarget = (event: Event): HTMLElement | null => {
-//   if (!event?.target) {
-//     return null;
-//   }
-
-//   return event.target as HTMLElement;
-// }
-
-const sendMessage = async (message: any): Promise<void> => {
+const sendMessage = async (message: Message): Promise<void> => {
   try {
     const tabs = await browser.tabs.query({currentWindow: true, active: true});
 
@@ -22,61 +15,38 @@ const sendMessage = async (message: any): Promise<void> => {
   }
 }
 
-// document.addEventListener("click", async (event: Event) => {
-//   if (!event?.target) {
-//     return;
-//   }
+// Listeners
+const transparencySlider = document.getElementById("transparency-slider") as HTMLInputElement;
+if (transparencySlider) {
+  transparencySlider.addEventListener("change", async (_event: Event) => {
+    debug("Transparency value changed!");
+    await sendMessage({type: "SETTINGS", transparency: parseInt(transparencySlider.value)});
+  });
+}
+const fuzzinessSlider = document.getElementById("fuzziness-slider") as HTMLInputElement;
+if (fuzzinessSlider) {
+  fuzzinessSlider.addEventListener("change", async (_event: Event) => {
+    debug("Fuzziness value changed!");
+    await sendMessage({type: "SETTINGS", fuzziness: parseInt(fuzzinessSlider.value)});
+  });
+}
 
-//   const target = event.target as HTMLElement;
-
-//   // if (!target.classList.contains("page-choice")) {
-//   //   return;
-//   // }
-
-//   // const chosenPage = `https://${target.textContent}`;
-//   // browser.tabs.create({
-//   //   url: chosenPage,
-//   // });
-
-//   try {
-//     const tabs = await browser.tabs.query({currentWindow: true, active: true});
-
-//     for (const tab of tabs) {
-//       const response = await browser.tabs.sendMessage(tab.id as number, {message: "a message"});
-//       debug(`Message sent, response: ${response.response}`);
-//     }
-//   } catch (err) {
-//     error(`Error sending message: ${err}`);
-//   }
-// });
-
-// Listener
-const slider = document.getElementById("transparency-slider") as HTMLInputElement;
-if (slider) {
-  slider.addEventListener("change", async (_event: Event) => {
-    debug("Slider value changed!");
-    await sendMessage({type: "SETTINGS", transparency: slider.value});
+const titleOnlyCheckbox = document.getElementById("title-checkbox") as HTMLInputElement;
+if (titleOnlyCheckbox) {
+  titleOnlyCheckbox.addEventListener("change", async (_event: Event) => {
+    debug("TitleOnly value changed!");
+    await sendMessage({type: "SETTINGS", titleOnly: titleOnlyCheckbox.checked});
   });
 }
 
 // Set the values from storage
-// getSettings().then(settings => {
-//   // debug();
-//   sendMessage({type: "DEBUG", message: `Setting slider value to "${settings.transparency}"`});
-//   slider.value = settings.transparency;
-// }).catch(err => {
-//   // error(`Error setting initial slider value: ${err}`);
-//   sendMessage({type: "DEBUG", message: `Error setting initial slider value: ${err}`});
-// });
-
-getSetting("transparency").then((transparency: string) => {
-  // debug();
-  sendMessage({type: "DEBUG", message: `Setting slider value to "${transparency}"`});
-  slider.value = transparency;
+getSettings().then((settings: Settings) => {
+  sendMessage({type: "DEBUG", message: `Initial settings: "${JSON.stringify(settings)}"`});
+  transparencySlider.value = settings.transparency.toString();
+  fuzzinessSlider.value = settings.fuzziness.toString();
+  titleOnlyCheckbox.checked = settings.titleOnly;
 }).catch(err => {
-  // error(`Error setting initial slider value: ${err}`);
-  sendMessage({type: "DEBUG", message: `Error setting initial slider value: ${err}`});
+  sendMessage({type: "DEBUG", message: `Error setting initial settings: ${err}`});
 });
-
 
 debug("Popup loaded");

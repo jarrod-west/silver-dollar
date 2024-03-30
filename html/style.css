@@ -17,18 +17,7 @@ body {
   padding: 5px;
 }
 
-.left-column {
-  /* text-align: right; */
-  padding: 5px;
-}
-
-.right-column {
-  padding: 5px;
-}
-
 .row-text {
-  /* display: flex; */
-  /* border: 2px solid black; */
   text-align: right;
   padding-right: 5px;
 }

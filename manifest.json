@@ -18,10 +18,6 @@
 
     "permissions": ["storage"],
 
-    "options_ui": {
-      "page": "html/options.html"
-    },
-
     "browser_specific_settings": {
       "gecko": {
         "id": "silver-dollar@example.org"
