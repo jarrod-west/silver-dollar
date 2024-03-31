@@ -12,7 +12,10 @@
     "content_scripts": [
       {
         "matches": ["*://*.gumtree.com.au/*"],
-        "js": ["bundle.js"]
+        "js": [
+          "browser-polyfill.js",
+          "bundle.js"
+        ]
       }
     ],
 

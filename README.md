@@ -7,3 +7,4 @@
 * Github action to auto-deploy?
 * Multi-browser
 * Readme
+* Better logging
