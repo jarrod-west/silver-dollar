@@ -1,16 +1,37 @@
-import { Message } from "../../types";
-import { devBuild, info, error, debug, sendMessageToWindow } from "../helpers";
+
 // import jsdom from "jsdom-global";
 // import "mockzilla-webextension";
+import type { Browser } from "webextension-polyfill";
+import { deepMock } from "mockzilla";
 
-// import type { Browser } from "webextension-polyfill";
-// import { deepMock } from "mockzilla";
 
 // jsdom(); // Setup the mock DOM
 
-// const [browser, _mockBrowser, mockBrowserNode] = deepMock<Browser>("browser", false);
+// This MUST be var to be "hoisted" before the mock on the next line
+// eslint-disable-next-line no-var
+var [browser, mockBrowser, mockBrowserNode] = deepMock<Browser>("browser", false);
+
+jest.mock("webextension-polyfill", () => ({
+  // browser
+  __esModule: true,
+  default: browser,
+}));
+
+import { Message, DebugMessage, MessageResponse } from "../../types";
+import { devBuild, info, error, debug, sendMessageToWindow } from "../helpers";
+
 
 // jest.mock("webextension-polyfill", () => browser);
+
+// let browser;
+// let mockBrowser;
+// let mockBrowserNode;
+
+// jest.mock("webextension-polyfill", () => {
+//   // browser
+//   [browser, mockBrowser, mockBrowserNode] = deepMock<Browser>("browser", false);
+//   return browser;
+// });
 
 describe("devBuild", () => {
 
@@ -95,41 +116,43 @@ describe("debug", () => {
   });
 });
 
-// describe("sendMessageToWindow", () => {
-//   // const tabQuerySpy = jest.spyOn(browser.tabs, "query");
-//   // const sendMessageSpy = jest.spyOn(browser.tabs, "sendMessage");
+describe("sendMessageToWindow", () => {
 
-//   afterEach(() => {
-//     // jest.resetAllMocks();
-//   });
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
 
-//   it("sends the message to the tab", async () => {
-//     const mockTab: browser.tabs.Tab = {
-//       id: 1,
-//     } as browser.tabs.Tab;
+  beforeEach(() => {
+    mockBrowserNode.enable();
+  })
 
-//     const message: Message = {
-//       type: "DEBUG",
-//       message: "Foo",
-//     };
+  afterEach(() => {
+    mockBrowserNode.disable();
+  })
 
-//     // tabQuerySpy.mockResolvedValueOnce([mockTab]);
-//     // sendMessageSpy.mockResolvedValueOnce({response: "success"});
-//     const mockListener = jest.fn();
-//     mockBrowser.runtime.onMessage.addListener.expect(
-//       mockListener,
-//       expect.anything(),
-//     );
-//     mockBrowser.tabs.query
-//       .expect({ currentWindow: true, active: true })
-//       .andResolve([mockTab]);
-//     mockBrowser.tabs.sendMessage
-//       .expect(1, message)
-//       .andResolve({ response: "success" } as any);
+  it("sends the message to the tab", async () => {
+    const mockTab: browser.tabs.Tab = {
+      id: 1,
+    } as browser.tabs.Tab;
 
-//     await sendMessageToWindow(message);
+    const message: DebugMessage = {
+      type: "DEBUG",
+      message: "Foo",
+    };
 
-//     // expect(sendMessageSpy).toHaveBeenCalledWith(1, message);
-//     // mockBrowser.
-//   });
-// });
+    const mockListener = jest.fn();
+    mockBrowser.runtime.onMessage.addListener.expect(
+      mockListener,
+      expect.anything(),
+    );
+    mockBrowser.tabs.query
+      .expect({ currentWindow: true, active: true })
+      .andResolve([mockTab]);
+    mockBrowser.tabs.sendMessage
+      .expect(expect.anything(), expect.anything())
+      // .andResolve<Message>({ response: "Success" });
+      .andResolve(true)
+
+    expect(await sendMessageToWindow(message)).toEqual({response: "Success"});
+  });
+});

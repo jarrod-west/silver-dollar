@@ -1,5 +1,6 @@
 import { Message, MessageResponse } from "../types";
-import * as browser from "webextension-polyfill";
+// import * as browser from "webextension-polyfill";
+import browser from "webextension-polyfill";
 
 export const devBuild = (): boolean => {
   return process.env.NODE_ENV === "development";
@@ -20,7 +21,7 @@ export const error = (msg: string) => {
   console.error(`[Silver Dollar: Error] ${msg}`);
 };
 
-export const sendMessageToWindow = async (message: Message): Promise<void> => {
+export const sendMessageToWindow = async (message: Message): Promise<MessageResponse> => {
   try {
     const tabs = await browser.tabs.query({
       currentWindow: true,
@@ -34,6 +35,7 @@ export const sendMessageToWindow = async (message: Message): Promise<void> => {
           message,
         )) as MessageResponse;
         debug(`Message sent, response: ${response.response}`);
+        return response;
       } else {
         error(`No ID for tab: ${JSON.stringify(tab)}`);
       }
@@ -41,4 +43,6 @@ export const sendMessageToWindow = async (message: Message): Promise<void> => {
   } catch (err) {
     error(`Error sending message: ${(err as Error).message}`);
   }
+
+  return { response: "Error" };
 };
