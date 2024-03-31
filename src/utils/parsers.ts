@@ -1,6 +1,8 @@
 import { debug, error } from "./helpers";
 
 // Classes
+export const MAIN_RESULTS_CLASS_NAME =
+  "search-results-page__user-ad-collection";
 const CLASSES = {
   gallery: {
     listingsClassName: "user-ad-square-new-design",
