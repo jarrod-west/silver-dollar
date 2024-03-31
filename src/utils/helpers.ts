@@ -1,4 +1,5 @@
 import { Message, MessageResponse } from "../types";
+import * as browser from "webextension-polyfill";
 
 export const devBuild = (): boolean => {
   return process.env.NODE_ENV === "development";

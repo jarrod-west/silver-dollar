@@ -1,4 +1,5 @@
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const commonExportConfig = {
   devtool: 'cheap-module-source-map', // Stop using eval for development mode, with causes CSP errors
@@ -16,7 +17,14 @@ const commonExportConfig = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
-  }
+  },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [{
+        from: 'node_modules/webextension-polyfill/dist/browser-polyfill.js',
+      }],
+    })
+  ]
 }
 
 // Two exports: main bundle and options
