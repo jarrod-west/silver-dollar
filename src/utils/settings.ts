@@ -56,6 +56,22 @@ export class PopupSetting {
     this.initialise(initialSettings);
   }
 
+  private onChange = (_event: Event) => {
+    debug(`Value for ${this.uiName} changed`);
+
+    const message: Record<string, string | number | boolean> = {
+      type: "SETTINGS",
+    };
+    message[this.name] =
+      this.uiType === "checkbox"
+        ? this.uiElement.checked
+        : parseInt(this.uiElement.value);
+
+    sendMessageToWindow(message as SettingsMessage).catch((err) =>
+      error(`Error sending message: ${(err as Error).message}`),
+    );
+  };
+
   public addChangeEventListener(callback: (event: Event) => void) {
     this.uiElement.addEventListener("change", callback);
   }
@@ -64,7 +80,15 @@ export class PopupSetting {
     this.uiElement.disabled = !enabled;
   }
 
-  public getUiValue(): boolean | number {
+  public isValid() {
+    return this.valid;
+  }
+
+  public getUiValue(): boolean | number | undefined {
+    if (!this.valid) {
+      return;
+    }
+
     if (this.uiType === "checkbox") {
       return this.uiElement.checked;
     } else {
@@ -75,21 +99,7 @@ export class PopupSetting {
   private initialise(initialSettings: RawSettings) {
     if (this.valid) {
       // Change Handler
-      this.addChangeEventListener((_event: Event) => {
-        debug(`Value for ${this.uiName} changed`);
-
-        const message: Record<string, string | number | boolean> = {
-          type: "SETTINGS",
-        };
-        message[this.name] =
-          this.uiType === "checkbox"
-            ? this.uiElement.checked
-            : parseInt(this.uiElement.value);
-
-        sendMessageToWindow(message as SettingsMessage).catch((err) =>
-          error(`Error sending message: ${(err as Error).message}`),
-        );
-      });
+      this.addChangeEventListener(this.onChange);
 
       // Initial Value
       if (this.uiType === "checkbox") {

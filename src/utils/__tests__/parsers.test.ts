@@ -1,8 +1,5 @@
-import "../../__tests__/testHelper";
+import { createElement } from "../../__tests__/testHelper";
 import { getListings, parseListing, parsePath } from "../parsers";
-import jsdom from "jsdom-global";
-
-jsdom(); // Setup the mock DOM
 
 // Helper to turn a list of elements into a HTMLCollection
 const createHtmlCollection = (elements: HTMLElement[]): HTMLCollection => {
@@ -13,12 +10,6 @@ const createHtmlCollection = (elements: HTMLElement[]): HTMLCollection => {
   }
 
   return fragment.children;
-};
-
-const createElement = (innerHTML: string): HTMLElement => {
-  const element = document.createElement("div");
-  element.innerHTML = innerHTML;
-  return element;
 };
 
 describe("parsePath", () => {
