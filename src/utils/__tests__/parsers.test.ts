@@ -1,16 +1,8 @@
-import { createElement } from "../../__tests__/testHelper";
+import {
+  createElement,
+  createHtmlCollection,
+} from "../../__tests__/testHelper";
 import { getListings, parseListing, parsePath } from "../parsers";
-
-// Helper to turn a list of elements into a HTMLCollection
-const createHtmlCollection = (elements: HTMLElement[]): HTMLCollection => {
-  const fragment = document.createDocumentFragment();
-
-  for (const element of elements) {
-    fragment.appendChild(element);
-  }
-
-  return fragment.children;
-};
 
 describe("parsePath", () => {
   it("parses the first results page", () => {
