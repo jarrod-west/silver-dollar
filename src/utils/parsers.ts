@@ -6,8 +6,8 @@ const CLASSES = {
     listingsClassName: "user-ad-square-new-design",
     titleClassName: "user-ad-square-new-design__title",
     summaryClassName: [
-      "user-ad-square-new-design__description user-ad-square-new-design__description--two-lines",
       "user-ad-square-new-design__description",
+      "user-ad-square-new-design__description user-ad-square-new-design__description--two-lines",
     ],
   },
   list: {
@@ -52,38 +52,47 @@ export const parsePath = (urlString: string): UrlComponents => {
   let pageMatch;
 
   if (pathTokens[pathTokens.length - 1].startsWith("c")) {
-    // Category-only search
+    // Category only
     category = pathTokens[1];
-  } else if (pathTokens.length == 3) {
-    // No category, page 1
-    searchQuery = pathTokens[1];
-  } else if (pathTokens.length == 5) {
-    // Both category AND page 2+
-    category = pathTokens[1];
-    searchQuery = pathTokens[2];
-    pageMatch = PAGE_REGEX.exec(pathTokens[3]);
-  } else {
-    // 4.  Could be two things
-    pageMatch = PAGE_REGEX.exec(pathTokens[2]);
 
-    if (pageMatch) {
-      // No category, but page 2+
-      searchQuery = pathTokens[1];
-    } else {
-      // Category and page 1
-      category = pathTokens[1];
-      searchQuery = pathTokens[2];
-      pageMatch = PAGE_REGEX.exec(pathTokens[3]);
+    if (pathTokens.length == 4) {
+      // Not the first page
+      pageMatch = PAGE_REGEX.exec(pathTokens[2]);
+    }
+  } else {
+    switch (pathTokens.length) {
+      case 3:
+        // No category
+        searchQuery = pathTokens[1];
+        break;
+      case 4:
+        // category = pathTokens[1];
+        pageMatch = PAGE_REGEX.exec(pathTokens[2]);
+        if (pageMatch) {
+          // No category, but page 2+
+          searchQuery = pathTokens[1];
+        } else {
+          category = pathTokens[1];
+          searchQuery = pathTokens[2];
+          pageMatch = PAGE_REGEX.exec(pathTokens[3]);
+        }
+        break;
+      case 5:
+        category = pathTokens[1];
+        searchQuery = pathTokens[2];
+        pageMatch = PAGE_REGEX.exec(pathTokens[3]);
+        break;
     }
   }
 
+  // Remove prefixes
   if (category) {
     category = removePrefix(category);
   } else if (searchQuery) {
     searchQuery = removePrefix(searchQuery);
   }
 
-  // 0th result is the entire match, first is the group
+  // 0th result is the entire match, first is the group.  Defaults to 1 if not present
   const page = pageMatch ? parseInt(pageMatch[1]) : 1;
 
   // Query params
