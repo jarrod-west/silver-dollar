@@ -1,6 +1,6 @@
 import { debug, error, sendMessageToWindow } from "./utils/helpers";
-import { getStoredSettings, PopupSetting } from "./settings";
-import { RawSettings } from "./types";
+import { getStoredSettings, PopupSetting } from "./utils/settings";
+import { RawSettings } from "./utils/types";
 
 // Initialse the UI with preloaded settings values, and create the listeners
 getStoredSettings()

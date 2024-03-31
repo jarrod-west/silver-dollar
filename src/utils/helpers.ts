@@ -1,4 +1,4 @@
-import { Message, MessageResponse } from "../types";
+import { Message, MessageResponse } from "./types";
 import browser from "webextension-polyfill";
 
 export const devBuild = (): boolean => {

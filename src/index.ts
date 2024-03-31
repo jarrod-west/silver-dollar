@@ -1,8 +1,8 @@
 import { debug, info, error, devBuild } from "./utils/helpers";
 import { Listing, parsePath, getListings, parseListing } from "./utils/parsers";
-import { filterListings } from "./filter";
-import { getStoredSettings } from "./settings";
-import { Message, MessageResponse } from "./types";
+import { filterListings } from "./utils/filter";
+import { getStoredSettings } from "./utils/settings";
+import { Message, MessageResponse } from "./utils/types";
 import browser from "webextension-polyfill";
 
 // Classes

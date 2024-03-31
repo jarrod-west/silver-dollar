@@ -1,4 +1,4 @@
-import { debug, error, sendMessageToWindow } from "./utils/helpers";
+import { debug, error, sendMessageToWindow } from "./helpers";
 import { RawSettings, SettingsMessage } from "./types";
 import browser from "webextension-polyfill";
 

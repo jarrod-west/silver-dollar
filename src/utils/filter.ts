@@ -1,13 +1,13 @@
-import { debug } from "./utils/helpers";
-import { Listing } from "./utils/parsers";
-import Fuse from "fuse.js";
+import { debug } from "./helpers";
+import { Listing } from "./parsers";
+import Fuse, { FuseResult } from "fuse.js";
 
 export const filterListings = (
   searchQuery: string,
   fuzziness: number,
   titleOnly: boolean,
   listings: Listing[],
-) => {
+): FuseResult<Listing>[] => {
   debug(
     `Filtering on searchQuery: ${searchQuery} with threshold: ${fuzziness}`,
   );

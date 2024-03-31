@@ -1,5 +1,5 @@
 import { mockQuery, mockSendMessage } from "../../__tests__/testHelper";
-import { DebugMessage } from "../../types";
+import { DebugMessage } from "../types";
 import { devBuild, info, error, debug, sendMessageToWindow } from "../helpers";
 
 describe("devBuild", () => {
