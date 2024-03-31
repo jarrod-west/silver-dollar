@@ -5,9 +5,10 @@ describe("parsePath", () => {
     const url = "https://www.gumtree.com.au/s-cars-vans-utes/test/k0c18320r10";
 
     expect(parsePath(url)).toEqual({
-      category: "s-cars-vans-utes",
+      category: "cars-vans-utes",
       searchQuery: "test",
       page: 1,
+      view: "list",
     });
   });
 
@@ -16,9 +17,10 @@ describe("parsePath", () => {
       "https://www.gumtree.com.au/s-cars-vans-utes/test/page-2/k0c18320r10";
 
     expect(parsePath(url)).toEqual({
-      category: "s-cars-vans-utes",
+      category: "cars-vans-utes",
       searchQuery: "test",
       page: 2,
+      view: "list",
     });
   });
 
@@ -27,10 +29,20 @@ describe("parsePath", () => {
       "https://www.gumtree.com.au/s-cars-vans-utes/test/k0c18320r10?view=gallery";
 
     expect(parsePath(url)).toEqual({
-      category: "s-cars-vans-utes",
+      category: "cars-vans-utes",
       searchQuery: "test",
       page: 1,
       view: "gallery",
+    });
+  });
+
+  it("handles category-only", () => {
+    const url = "https://www.gumtree.com.au/s-home-garden/c18397";
+
+    expect(parsePath(url)).toEqual({
+      category: "home-garden",
+      page: 1,
+      view: "list",
     });
   });
 });

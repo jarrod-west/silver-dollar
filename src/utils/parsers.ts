@@ -23,7 +23,7 @@ type View = "gallery" | "list";
 
 export type UrlComponents = {
   category?: string;
-  searchQuery: string;
+  searchQuery?: string;
   page: number;
   view: View;
 };
@@ -32,6 +32,10 @@ export type Listing = {
   htmlNode: HTMLElement;
   title: string;
   summary: string;
+};
+
+const removePrefix = (value: string): string => {
+  return value.slice(2); // Remove the "s-" prefix
 };
 
 export const parsePath = (urlString: string): UrlComponents => {
@@ -46,7 +50,11 @@ export const parsePath = (urlString: string): UrlComponents => {
   let category;
   let searchQuery;
   let pageMatch;
-  if (pathTokens.length == 3) {
+
+  if (pathTokens[pathTokens.length - 1].startsWith("c")) {
+    // Category-only search
+    category = pathTokens[1];
+  } else if (pathTokens.length == 3) {
     // No category, page 1
     searchQuery = pathTokens[1];
   } else if (pathTokens.length == 5) {
@@ -69,8 +77,10 @@ export const parsePath = (urlString: string): UrlComponents => {
     }
   }
 
-  if (!category) {
-    searchQuery = searchQuery.slice(2); // Remove the "s-""
+  if (category) {
+    category = removePrefix(category);
+  } else if (searchQuery) {
+    searchQuery = removePrefix(searchQuery);
   }
 
   // 0th result is the entire match, first is the group

@@ -70,6 +70,12 @@ export const main = async () => {
   }
 
   const urlComponents = parsePath(document.URL);
+
+  // May be a category browse, if so we skip
+  if (!urlComponents.searchQuery) {
+    return;
+  }
+
   const listingsNode = getListings(urlComponents.view);
   const listings = Array.from(listingsNode).map((listing) =>
     parseListing(urlComponents.view, listing),
