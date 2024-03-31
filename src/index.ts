@@ -3,7 +3,7 @@ import { Listing, parsePath, getListings, parseListing } from "./utils/parsers";
 import { filterListings } from "./filter";
 import { getStoredSettings } from "./settings";
 import { Message, MessageResponse } from "./types";
-import * as browser from "webextension-polyfill";
+import browser from "webextension-polyfill";
 
 // Classes
 const MAIN_RESULTS_CLASS_NAME = "search-results-page__user-ad-collection";

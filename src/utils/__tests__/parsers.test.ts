@@ -1,3 +1,4 @@
+import "../../__tests__/testHelper";
 import { getListings, parseListing, parsePath } from "../parsers";
 import jsdom from "jsdom-global";
 

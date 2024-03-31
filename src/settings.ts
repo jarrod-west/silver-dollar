@@ -1,6 +1,6 @@
 import { debug, error, sendMessageToWindow } from "./utils/helpers";
 import { RawSettings, SettingsMessage } from "./types";
-import * as browser from "webextension-polyfill";
+import browser from "webextension-polyfill";
 
 // Settings
 const DEFAULT_SETTINGS: RawSettings = {

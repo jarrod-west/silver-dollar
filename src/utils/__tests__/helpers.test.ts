@@ -1,41 +1,9 @@
-
-// import jsdom from "jsdom-global";
-// import "mockzilla-webextension";
-import type { Browser } from "webextension-polyfill";
-import { deepMock } from "mockzilla";
-
-
-// jsdom(); // Setup the mock DOM
-
-// This MUST be var to be "hoisted" before the mock on the next line
-// eslint-disable-next-line no-var
-var [browser, mockBrowser, mockBrowserNode] = deepMock<Browser>("browser", false);
-
-jest.mock("webextension-polyfill", () => ({
-  // browser
-  __esModule: true,
-  default: browser,
-}));
-
-import { Message, DebugMessage, MessageResponse } from "../../types";
+import { mockQuery, mockSendMessage } from "../../__tests__/testHelper";
+import { DebugMessage } from "../../types";
 import { devBuild, info, error, debug, sendMessageToWindow } from "../helpers";
 
-
-// jest.mock("webextension-polyfill", () => browser);
-
-// let browser;
-// let mockBrowser;
-// let mockBrowserNode;
-
-// jest.mock("webextension-polyfill", () => {
-//   // browser
-//   [browser, mockBrowser, mockBrowserNode] = deepMock<Browser>("browser", false);
-//   return browser;
-// });
-
 describe("devBuild", () => {
-
-  let oldEnv: { [key: string]: string | undefined; };
+  let oldEnv: { [key: string]: string | undefined };
 
   beforeEach(() => {
     oldEnv = { ...process.env };
@@ -46,22 +14,22 @@ describe("devBuild", () => {
   });
 
   it("returns true for development", () => {
-    process.env.NODE_ENV="development";
+    process.env.NODE_ENV = "development";
 
     expect(devBuild()).toEqual(true);
   });
 
   it("returns false for production", () => {
-    process.env.NODE_ENV="production";
+    process.env.NODE_ENV = "production";
 
     expect(devBuild()).toEqual(false);
-  })
+  });
 
   it("returns false for unknown", () => {
-    process.env.NODE_ENV=undefined;
+    process.env.NODE_ENV = undefined;
 
     expect(devBuild()).toEqual(false);
-  })
+  });
 });
 
 describe("info", () => {
@@ -92,7 +60,7 @@ describe("error", () => {
 
 describe("debug", () => {
   const logSpy = jest.spyOn(console, "log");
-  let oldEnv: { [key: string]: string | undefined; };
+  let oldEnv: { [key: string]: string | undefined };
 
   beforeEach(() => {
     oldEnv = { ...process.env };
@@ -104,55 +72,74 @@ describe("debug", () => {
   });
 
   it("logs the message when development", () => {
-    process.env.NODE_ENV="development";
+    process.env.NODE_ENV = "development";
     debug("foo");
     expect(logSpy).toHaveBeenCalledWith("[Silver Dollar: Debug] foo");
   });
 
   it("doesn't log the message when not development", () => {
-    process.env.NODE_ENV="production";
+    process.env.NODE_ENV = "production";
     debug("foo");
     expect(logSpy).not.toHaveBeenCalled();
   });
 });
 
 describe("sendMessageToWindow", () => {
-
   afterEach(() => {
     jest.resetAllMocks();
   });
 
-  beforeEach(() => {
-    mockBrowserNode.enable();
-  })
+  const mockTab = { id: 1 };
 
-  afterEach(() => {
-    mockBrowserNode.disable();
-  })
+  const message: DebugMessage = {
+    type: "DEBUG",
+    message: "Foo",
+  };
 
   it("sends the message to the tab", async () => {
-    const mockTab: browser.tabs.Tab = {
-      id: 1,
-    } as browser.tabs.Tab;
+    mockQuery.mockResolvedValueOnce([mockTab]);
+    mockSendMessage.mockResolvedValueOnce({ response: "Success" });
 
-    const message: DebugMessage = {
-      type: "DEBUG",
-      message: "Foo",
-    };
+    expect(await sendMessageToWindow(message)).toEqual({ response: "Success" });
 
-    const mockListener = jest.fn();
-    mockBrowser.runtime.onMessage.addListener.expect(
-      mockListener,
-      expect.anything(),
-    );
-    mockBrowser.tabs.query
-      .expect({ currentWindow: true, active: true })
-      .andResolve([mockTab]);
-    mockBrowser.tabs.sendMessage
-      .expect(expect.anything(), expect.anything())
-      // .andResolve<Message>({ response: "Success" });
-      .andResolve(true)
+    expect(mockQuery).toHaveBeenCalledWith({
+      currentWindow: true,
+      active: true,
+    });
+    expect(mockSendMessage).toHaveBeenCalledWith(1, message);
+  });
 
-    expect(await sendMessageToWindow(message)).toEqual({response: "Success"});
+  it("returns an error if no tab is found", async () => {
+    mockQuery.mockResolvedValueOnce([{}]);
+
+    expect(await sendMessageToWindow(message)).toEqual({ response: "Error" });
+    expect(mockQuery).toHaveBeenCalledWith({
+      currentWindow: true,
+      active: true,
+    });
+    expect(mockSendMessage).not.toHaveBeenCalled();
+  });
+
+  it("returns an error if the query errors", async () => {
+    mockQuery.mockRejectedValue({ message: "An error occurred" });
+
+    expect(await sendMessageToWindow(message)).toEqual({ response: "Error" });
+    expect(mockQuery).toHaveBeenCalledWith({
+      currentWindow: true,
+      active: true,
+    });
+    expect(mockSendMessage).not.toHaveBeenCalled();
+  });
+
+  it("returns an error if the message send errors", async () => {
+    mockQuery.mockResolvedValueOnce([mockTab]);
+    mockSendMessage.mockRejectedValue({ message: "An error occurred" });
+
+    expect(await sendMessageToWindow(message)).toEqual({ response: "Error" });
+    expect(mockQuery).toHaveBeenCalledWith({
+      currentWindow: true,
+      active: true,
+    });
+    expect(mockSendMessage).toHaveBeenCalledWith(1, message);
   });
 });

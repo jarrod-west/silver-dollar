@@ -1,7 +1,5 @@
 import { debug, error } from "./helpers";
 
-jest.mock("webextension-polyfill", () => {});
-
 // Classes
 const CLASSES = {
   gallery: {

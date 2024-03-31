@@ -1,5 +1,4 @@
 import { Message, MessageResponse } from "../types";
-// import * as browser from "webextension-polyfill";
 import browser from "webextension-polyfill";
 
 export const devBuild = (): boolean => {
@@ -21,7 +20,9 @@ export const error = (msg: string) => {
   console.error(`[Silver Dollar: Error] ${msg}`);
 };
 
-export const sendMessageToWindow = async (message: Message): Promise<MessageResponse> => {
+export const sendMessageToWindow = async (
+  message: Message,
+): Promise<MessageResponse> => {
   try {
     const tabs = await browser.tabs.query({
       currentWindow: true,
