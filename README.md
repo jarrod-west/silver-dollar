@@ -6,7 +6,7 @@ _known for being particularly small and compact_
 ## Overview
 
 The practice of [spamdexing](https://en.wikipedia.org/wiki/Spamdexing) is alive
-and well on gumtree.com, with unscrupulous sellers able to manipulate search
+and well on `gumtree.com`, with unscrupulous sellers able to manipulate search
 results by adding a serious of keyword "tags" at the end of their description.
 
 This appears to be especially egregious from car dealerships, and so searching
@@ -27,6 +27,11 @@ If a listing fails to meet the required match threshold, rather than being
 removed entirely it will be rendered mostly transparent. This allows the user
 to easily skim past these listings, while still allowing them to be viewed
 if desired.
+
+Here's an example (note that this screenshot has had some identifying features
+from both result sets blurred for privacy).
+
+![](images/example.png)
 
 ## Settings
 
