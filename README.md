@@ -70,9 +70,8 @@ report
 * `pre-push` - run prettier and lint in sequence. This is run as a hook on
 `git push`
 
-# TODO:
+### TODO:
 
-* Restrict URL to only search results ("/s-*", maybe?)
-* Github action to auto-deploy?
-* Multi-browser PARTIAL
-* Better logging
+* Improve efficiency by restricting the acted-on URL to only search pages
+* Utilise github actions to automatically create releases
+* Improve logging using a proper logger and better standards
