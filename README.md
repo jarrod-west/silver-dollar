@@ -73,7 +73,6 @@ report
 # TODO:
 
 * Restrict URL to only search results ("/s-*", maybe?)
-* Better CSS, including (inherited) dark mode
 * Github action to auto-deploy?
 * Multi-browser PARTIAL
 * Better logging
