@@ -6,21 +6,40 @@ import {
 } from "../../__tests__/testHelper";
 import * as renderer from "../renderer";
 import * as helpers from "../helpers";
+import * as parsers from "../parsers";
+import * as filter from "../filter";
 import { Message } from "../types";
 
-// describe("onMutation", () => {
+describe("onMutation", () => {
+  let renderSpy: jest.SpyInstance;
+  let old: {
+    prototype: MutationObserver;
+    new (callback: MutationCallback): MutationObserver;
+  };
+  const mockMutationObserver = jest.fn();
 
-//   afterEach(() => {
-//     jest.resetAllMocks();
-//   })
+  beforeEach(() => {
+    old = global.MutationObserver;
+    global.MutationObserver = mockMutationObserver;
+    renderSpy = jest.spyOn(renderer, "render");
+  });
 
-//   it ("calls render", () => {
-//     const renderSpy = jest.spyOn(renderer, "render");
-//     renderSpy.mockResolvedValueOnce(undefined);
-//     renderer["onMutation"]();
-//     expect(renderSpy).toHaveBeenCalledTimes(1)
-//   });
-// })
+  afterEach(() => {
+    global.MutationObserver = old;
+    jest.resetAllMocks();
+    jest.resetAllMocks();
+    renderSpy.mockRestore();
+  });
+
+  it("calls render", () => {
+    renderSpy.mockResolvedValueOnce(undefined);
+    renderer.onMutation(
+      [{ type: "attributes" } as MutationRecord],
+      new MutationObserver(() => {}),
+    );
+    expect(renderSpy).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe("createMessageListener", () => {
   it("calls addListener", () => {
@@ -77,6 +96,18 @@ describe("createDisplayChangeObserver", () => {
 });
 
 describe("onMessage", () => {
+  // const renderSpy = jest.spyOn(renderer, "render");
+  let renderSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    renderSpy = jest.spyOn(renderer, "render");
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+    renderSpy.mockRestore();
+  });
+
   it("logs a debug message for DEBUG messages", async () => {
     const message: Message = { type: "DEBUG", message: "foo" };
     const debugSpy = jest.spyOn(helpers, "debug");
@@ -96,7 +127,6 @@ describe("onMessage", () => {
   });
 
   it("stores settings and re-renders for SETTINGS messages", async () => {
-    const renderSpy = jest.spyOn(renderer, "render");
     renderSpy.mockResolvedValueOnce(undefined);
     mockStorage.mockResolvedValueOnce(undefined);
 
@@ -118,5 +148,112 @@ describe("onMessage", () => {
     expect(errorSpy).toHaveBeenCalledWith(
       expect.stringContaining("Unexpected message type"),
     );
+  });
+});
+
+describe("render", () => {
+  const parsePathSpy = jest.spyOn(parsers, "parsePath");
+  const getListingsSpy = jest.spyOn(parsers, "getListings");
+  const parseListingSpy = jest.spyOn(parsers, "parseListing");
+  const filterListings = jest.spyOn(filter, "filterListings");
+
+  const mockListing1 = createElement("listing1");
+  const mockListing2 = createElement("listing2");
+  const mockListing3 = createElement("listing3");
+
+  const collection = createHtmlCollection([
+    mockListing1,
+    mockListing2,
+    mockListing3,
+  ]);
+
+  const listings = [
+    {
+      title: "listing1 title",
+      summary: "listing1 summary",
+      htmlNode: mockListing1,
+    },
+    {
+      title: "listing2 title",
+      summary: "listing2 summary",
+      htmlNode: mockListing2,
+    },
+    {
+      title: "listing3 title",
+      summary: "listing3 summary",
+      htmlNode: mockListing3,
+    },
+  ];
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  it("returns early if the page is not a query-based search", async () => {
+    parsePathSpy.mockReturnValueOnce({
+      category: "cars-vans-utes",
+      page: 1,
+      view: "list",
+    });
+
+    await renderer.render();
+    expect(getListingsSpy).not.toHaveBeenCalled();
+  });
+
+  describe("when the page is a query-based search", () => {
+    const mockFilterResponse = [
+      { item: listings[0], refIndex: 1 },
+      { item: listings[2], refIndex: 3 },
+    ];
+
+    const mockSettings = {
+      transparency: 80,
+      enabled: true,
+      fuzziness: 30,
+      titleOnly: true,
+    };
+
+    beforeEach(() => {
+      parsePathSpy.mockReturnValueOnce({
+        category: "cars-vans-utes",
+        searchQuery: "rx7",
+        page: 1,
+        view: "list",
+      });
+
+      getListingsSpy.mockReturnValueOnce(
+        collection as HTMLCollectionOf<HTMLElement>,
+      );
+
+      parseListingSpy.mockReturnValueOnce(listings[0]);
+      parseListingSpy.mockReturnValueOnce(listings[1]);
+      parseListingSpy.mockReturnValueOnce(listings[2]);
+    });
+
+    it("sets the non-filtered listings to a lower opacity", async () => {
+      mockStorage.mockResolvedValueOnce(mockSettings);
+
+      filterListings.mockReturnValueOnce(mockFilterResponse);
+
+      await renderer.render();
+
+      expect(listings[0].htmlNode.style.opacity).toEqual("1");
+      expect(listings[2].htmlNode.style.opacity).toEqual("1");
+      expect(listings[1].htmlNode.style.opacity).toEqual("0.2");
+    });
+
+    it("sets all listings to full opacity when the extension is disabled", async () => {
+      mockStorage.mockResolvedValueOnce({
+        ...mockSettings,
+        enabled: false,
+      });
+
+      await renderer.render();
+
+      expect(filterListings).not.toHaveBeenCalled();
+      expect(listings[0].htmlNode.style.opacity).toEqual("1");
+      expect(listings[2].htmlNode.style.opacity).toEqual("1");
+      expect(listings[1].htmlNode.style.opacity).toEqual("1");
+    });
   });
 });

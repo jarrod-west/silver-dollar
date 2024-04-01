@@ -11,7 +11,7 @@ import { Message, MessageResponse } from "./types";
 import { getStoredSettings } from "./settings";
 import browser from "webextension-polyfill";
 
-const onMutation: MutationCallback = (
+export const onMutation: MutationCallback = (
   mutationList: MutationRecord[],
   _observer: MutationObserver,
 ) => {
