@@ -58,51 +58,9 @@ input[type="checkbox"]:checked {
   opacity: 0.7;
   -webkit-transition: .2s; /* 0.2 seconds transition on hover */
   transition: opacity .2s;
+  accent-color: var(--text-colour);
 }
 
 .slider:hover {
   opacity: 1; /* Fully shown on mouse-over */
-}
-
-/* Firefox */
-input[type="range"]::-moz-range-progress {
-  background-color: var(--text-colour);
-}
-
-input[type="range"]::-moz-range-track {
-  background-color: var(--lighter-background);
-}
-
-/* IE TODO - Necessary for edge? */
-input[type="range"]::-ms-fill-lower {
-  background-color: var(--text-colour);
-}
-input[type="range"]::-ms-fill-upper {
-  background-color: var(--lighter-background);
-}
-
-/*Chrome*/
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  input[type='range'] {
-    overflow: hidden;
-    /* width: 80px; */
-    -webkit-appearance: none;
-    background-color: var(--main-background);
-  }
-
-  input[type='range']::-webkit-slider-runnable-track {
-    height: 10px;
-    -webkit-appearance: none;
-    color: var(--text-colour);
-    margin-top: -1px;
-  }
-
-  input[type='range']::-webkit-slider-thumb {
-    width: 10px;
-    -webkit-appearance: none;
-    height: 10px;
-    cursor: ew-resize;
-    background: var(--main-background);
-    box-shadow: -80px 0 0 80px var(--text-colour);
-  }
 }
