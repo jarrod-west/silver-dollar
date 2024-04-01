@@ -6,7 +6,7 @@
     "description": "Adds a blue border to all webpages matching mozilla.org.",
 
     "icons": {
-      "48": "icons/border-48.png"
+      "48": "icons/silver-dollar-48.png"
     },
 
     "content_scripts": [
@@ -30,8 +30,8 @@
     "browser_action": {
       "default_popup": "html/popup.html",
       "default_icon": {
-        "16": "icons/border-16.png",
-        "32": "icons/border-32.png"
+        "16": "icons/silver-dollar-16.png",
+        "32": "icons/silver-dollar-32.png"
       }
     }
   }
