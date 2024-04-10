@@ -1,7 +1,7 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Silver Dollar",
-    "version": "1.0",
+    "version": "1.0.1",
 
     "description": "Filters out bad search results from gumtree.com.au",
 
@@ -11,7 +11,7 @@
 
     "content_scripts": [
       {
-        "matches": ["*://*.gumtree.com.au/*"],
+        "matches": ["https://www.gumtree.com.au/*"],
         "js": [
           "browser-polyfill.js",
           "bundle.js"
@@ -27,7 +27,7 @@
       }
     },
 
-    "browser_action": {
+    "action": {
       "default_popup": "html/popup.html",
       "default_icon": {
         "16": "icons/silver-dollar-16.png",

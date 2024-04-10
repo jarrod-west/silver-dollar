@@ -6,8 +6,9 @@ _known for being particularly small and compact_
 ## Overview
 
 The practice of [spamdexing](https://en.wikipedia.org/wiki/Spamdexing) is alive
-and well on `gumtree.com`, with unscrupulous sellers able to manipulate search
-results by adding a serious of keyword "tags" at the end of their description.
+and well on `gumtree.com.au`, with unscrupulous sellers able to manipulate
+search results by adding a serious of keyword "tags" at the end of their
+description.
 
 This appears to be especially egregious from car dealerships, and so searching
 for a specific make of car often requires wading through a huge number of
