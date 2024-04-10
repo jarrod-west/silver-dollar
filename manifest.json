@@ -3,7 +3,7 @@
     "name": "Silver Dollar",
     "version": "1.0",
 
-    "description": "Filters out bad search results from gumtree.com",
+    "description": "Filters out bad search results from gumtree.com.au",
 
     "icons": {
       "48": "icons/silver-dollar-48.png"
