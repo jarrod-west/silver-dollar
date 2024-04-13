@@ -49,6 +49,8 @@ results page. If the latter, note that listings that include the spam tags
 towards the top of their description will likely have them present here,
 leading to false positives.
 
+![](images/settings.png)
+
 ## Development
 
 This extension is written in typescript, using webpack to bundle it for
@@ -71,7 +73,7 @@ report
 * `pre-push` - run prettier and lint in sequence. This is run as a hook on
 `git push`
 
-### TODO:
+### Future Enhancements
 
 * Improve efficiency by restricting the acted-on URL to only search pages
 * Utilise github actions to automatically create releases
