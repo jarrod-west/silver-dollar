@@ -36,6 +36,8 @@ from both result sets blurred for privacy).
 
 ## Settings
 
+![](images/settings.png)
+
 * `Enabled` - Used to entirely disable the extension
 * `Transparency` - Adjusts the level of transparency that filtered-out listings
 will be rendered as. Goes from 0 (fully opaque) to 100 (fully transparent)
@@ -49,7 +51,7 @@ results page. If the latter, note that listings that include the spam tags
 towards the top of their description will likely have them present here,
 leading to false positives.
 
-![](images/settings.png)
+
 
 ## Development
 
